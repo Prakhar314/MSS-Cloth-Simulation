@@ -12,7 +12,7 @@ int main() {
   while (!s.shouldQuit()) {
     float tnew = SDL_GetTicks64() / 1e3;
     std::cout << tnew - t << std::endl;
-    s.update((tnew - t) * 1.5f);
+    s.update((tnew - t) * 1.0f);
     s.render();
     t = tnew;
   }

@@ -51,11 +51,11 @@ class Sheet : public Shape {
   glm::vec3 *velocities = nullptr;
   glm::vec3 *acc = nullptr;
   uint32_t nSprings, width, height, spacing;
-  float mass = 0.5f;
-  float ksStr = 1.2f, kdStr = 0.6f;
-  float ksBend = 0.6f, kdBend = 0.3f;
-  float ksShear = 1.0f, kdShear = 0.5f;
-  float g = -0.04f;
+  float mass = 0.001f;
+  float ksStr = 0.12f, kdStr = 0.0012f;
+  float ksBend = 0.01f, kdBend = 0.0001f;
+  float ksShear = 0.06f, kdShear = 0.0006f;
+  float g = -0.98f;
 
 public:
   Sheet(uint32_t width, uint32_t height, float spacing);
