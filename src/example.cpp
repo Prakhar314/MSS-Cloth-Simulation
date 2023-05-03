@@ -1,15 +1,19 @@
 #include "./simulator.hpp"
+#include <iostream>
 
 int main() {
   int width = 640, height = 480;
 
   Simulator s;
   s.init("Animation", width, height);
-  s.createScene();
+  s.addSheet(10, 10, 0.1);
 
+  float t = SDL_GetTicks64() / 1e3;
   while (!s.shouldQuit()) {
-    float t = SDL_GetTicks64() / 1e3;
-    s.update(t);
+    float tnew = SDL_GetTicks64() / 1e3;
+    std::cout << tnew - t << std::endl;
+    s.update((tnew - t) * 1.5f);
     s.render();
+    t = tnew;
   }
 }
