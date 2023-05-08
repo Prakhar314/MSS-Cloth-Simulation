@@ -10,8 +10,8 @@ find_package(glm REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(SDL2 REQUIRED)
 
-add_library(col781 src/hw.cpp src/camera.cpp src/simulator.cpp)
+add_library(col781 src/hw.cpp src/camera.cpp src/simulator.cpp src/shape.cpp)
 target_link_libraries(col781 GLEW::GLEW glm::glm OpenGL::GL SDL2::SDL2)
 
-add_executable(example src/example.cpp)
-target_link_libraries(example col781)
+add_executable(e1 examples/e1.cpp)
+target_link_libraries(e1 col781)
