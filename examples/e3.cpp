@@ -32,7 +32,7 @@ int main() {
   c->setDimensions(0.1f, 2.0f, 20, 10);
   c->init();
   c->initTransform(m);
-  c->initConstantVelocity(glm::vec3(0.0f, 0.2f, 0.0f));
+  c->setConstantVelocity(glm::vec3(0.0f, 0.2f, 0.0f));
   c->color = glm::vec3(0.0f, 0.0f, 0.5f);
   s.addShape(c);
 

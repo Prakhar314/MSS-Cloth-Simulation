@@ -1,6 +1,7 @@
 #pragma once
 #include "./hw.hpp"
 #include <cstdint>
+#include <glm/fwd.hpp>
 #include <glm/glm.hpp>
 #include <string>
 #include <tuple>
@@ -20,11 +21,14 @@ protected:
   glm::vec3 *velocities = nullptr;
   glm::vec3 *acc = nullptr;
 
+  glm::vec3 constantVelocity = glm::vec3(0.0f);
+  glm::vec3 constantOmega = glm::vec3(0.0f);
+
   float e = 0.5f, mu = 0.5f;
 
   void initBuffers();
-
   void recomputeNormals();
+  virtual glm::vec3 getCenter() = 0;
 
 public:
   GL::Object object;
@@ -33,7 +37,7 @@ public:
 
   virtual void update(float t);
 
-  void initConstantVelocity(const glm::vec3 &v);
+  void setConstantVelocity(const glm::vec3 &v);
   void initTransform(const glm::mat4 &M);
 
   void setMaterial(float e, float mu) {
@@ -50,8 +54,8 @@ public:
     return false;
   }
 
-  void getDV(const glm::vec3 &v, const glm::vec3 &normal, float mass,
-             glm::vec3 *dv);
+  void getDV(const glm::vec3 &v, const glm::vec3 &poc, const glm::vec3 &normal,
+             float mass, glm::vec3 *dv);
 
   void getObject(uint32_t &nv, glm::vec3 *&vertices, uint32_t &nn,
                  glm::vec3 *&normals, uint32_t &nt, glm::ivec3 *&triangles) {
@@ -69,8 +73,10 @@ public:
     delete[] vertices;
     delete[] normals;
     delete[] triangles;
-    delete[] velocities;
-    delete[] acc;
+    if (isSheet()) {
+      delete[] velocities;
+      delete[] acc;
+    }
   }
 };
 
@@ -122,6 +128,8 @@ public:
     delete[] springs;
   }
 
+  glm::vec3 getCenter() override;
+
   void update(float t) override;
 };
 
@@ -140,6 +148,7 @@ public:
   bool checkCollision(const glm::vec3 p, const glm::vec3 v, float m,
                       glm::vec3 *dp, glm::vec3 *dv) override;
 
+  glm::vec3 getCenter() override;
   void init();
 };
 
@@ -152,6 +161,7 @@ public:
   bool checkCollision(const glm::vec3 p, const glm::vec3 v, float m,
                       glm::vec3 *dp, glm::vec3 *dv) override;
 
+  glm::vec3 getCenter() override;
   void init();
 };
 
@@ -173,5 +183,6 @@ public:
   bool checkCollision(const glm::vec3 p, const glm::vec3 v, float m,
                       glm::vec3 *dp, glm::vec3 *dv) override;
 
+  glm::vec3 getCenter() override;
   void init();
 };
