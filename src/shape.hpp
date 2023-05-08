@@ -1,8 +1,10 @@
 #pragma once
 #include "./hw.hpp"
+#include <cstdint>
 #include <glm/glm.hpp>
 #include <string>
 #include <tuple>
+#include <vector>
 
 namespace GL = COL781::OpenGL;
 
@@ -12,6 +14,13 @@ protected:
   glm::vec3 *vertices = nullptr;
   glm::vec3 *normals = nullptr;
   glm::ivec3 *triangles = nullptr;
+  glm::vec3 *velocities = nullptr;
+  glm::vec3 *acc = nullptr;
+  glm::vec3 origin = glm::vec3(0, 0, 0);
+
+  float e = 0.5f, mu = 0.5f;
+
+  void initBuffers();
 
   void recomputeNormals();
 
@@ -21,6 +30,23 @@ public:
   glm::vec3 color = glm::vec3(1.0, 0.5, 0.0);
 
   virtual void update(float t) {}
+
+  void initTransform(const glm::mat4 &M);
+
+  void setMaterial(float e, float mu) {
+    this->e = e;
+    this->mu = mu;
+  }
+
+  virtual bool isSheet() { return false; }
+
+  virtual void collide(Shape *s) {}
+
+  virtual bool checkCollision(const glm::vec3 p, const glm::vec3 v, float m,
+                              glm::vec3 *dp, glm::vec3 *dv) {
+    return false;
+  }
+
   void getObject(uint32_t &nv, glm::vec3 *&vertices, uint32_t &nn,
                  glm::vec3 *&normals, uint32_t &nt, glm::ivec3 *&triangles) {
     nv = this->nv;
@@ -30,12 +56,15 @@ public:
     normals = this->normals;
     triangles = this->triangles;
   }
+
   ~Shape() {
     if (vertices == nullptr)
       return;
     delete[] vertices;
     delete[] normals;
     delete[] triangles;
+    delete[] velocities;
+    delete[] acc;
   }
 };
 
@@ -51,9 +80,8 @@ public:
 
 class Sheet : public Shape {
   Spring *springs = nullptr;
-  glm::vec3 *velocities = nullptr;
-  glm::vec3 *acc = nullptr;
   uint32_t nSprings = 0, width = 0, height = 0;
+  std::vector<uint32_t> fixedParticles;
   float spacing = 0;
   float mass = 0.001f;
   float ksStr = 0.12f, kdStr = 0.0012f;
@@ -63,7 +91,13 @@ class Sheet : public Shape {
 
 public:
   Sheet() {}
+
+  bool isSheet() override { return true; }
+
+  void collide(Shape *s) override;
+
   void setDimensions(uint32_t width, uint32_t height, float spacing);
+  void setGravity(float g) { this->g = g; }
   void setMass(float mass) { this->mass = mass; }
   void setSpringConstants(float ksStr, float kdStr, float ksBend, float kdBend,
                           float ksShear, float kdShear) {
@@ -74,6 +108,7 @@ public:
     this->ksShear = ksShear;
     this->kdShear = kdShear;
   }
+  void fixParticle(uint32_t i, uint32_t j);
   void init();
   ~Sheet() {
     if (springs == nullptr)
@@ -82,4 +117,24 @@ public:
   }
 
   void update(float t) override;
+};
+
+class Sphere : public Shape {
+  float radius = 0.0f;
+  uint32_t nLat = 0;
+  uint32_t nLong = 0;
+
+public:
+  Sphere() {}
+
+  void setDimensions(float radius, uint32_t nLat, uint32_t nLong) {
+    this->radius = radius;
+    this->nLat = nLat;
+    this->nLong = nLong;
+  }
+
+  bool checkCollision(const glm::vec3 p, const glm::vec3 v, float m,
+                      glm::vec3 *dp, glm::vec3 *dv) override;
+
+  void init();
 };

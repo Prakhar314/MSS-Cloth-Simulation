@@ -1,3 +1,4 @@
+
 #include "../src/shape.hpp"
 #include "../src/simulator.hpp"
 #include <glm/gtx/transform.hpp>
@@ -6,10 +7,11 @@
 int main() {
   int width = 640, height = 480;
 
-  glm::mat4 m = glm::translate(glm::mat4(1.0f), glm::vec3(0.5f, 0.0f, 0.0f));
-
   Simulator s;
   s.init("Animation", width, height);
+
+  glm::mat4 m = glm::translate(glm::mat4(1.0f), glm::vec3(0.5f, -0.0f, 0.0f));
+
   Sheet *sheet = new Sheet();
   sheet->setDimensions(10, 10, 0.1f);
   sheet->init();
@@ -17,6 +19,16 @@ int main() {
   sheet->fixParticle(10, 10);
   sheet->initTransform(m);
   s.addShape(sheet);
+
+  m = glm::translate(m, glm::vec3(0.0f, -1.0f, -0.0f));
+
+  Sphere *sphere = new Sphere();
+  sphere->setDimensions(0.2f, 20, 20);
+  sphere->init();
+  sphere->initTransform(m);
+  sphere->setMaterial(0.5f, 0.5f);
+  sphere->color = glm::vec3(1.0f, 0.0f, 0.0f);
+  s.addShape(sphere);
 
   float t = SDL_GetTicks64() / 1e3;
   while (!s.shouldQuit()) {

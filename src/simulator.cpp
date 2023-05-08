@@ -34,8 +34,23 @@ void Simulator::addShape(Shape *shape) {
 
 void Simulator::update(float t) {
   for (int i = 0; i < shapes.size(); ++i) {
+    shapes[i]->update(t);
+  }
+
+  for (int i = 0; i < shapes.size(); ++i) {
     Shape *shape = shapes[i];
-    shape->update(t);
+    if (shape->isSheet()) {
+      for (int j = i + 1; j < shapes.size(); ++j) {
+        Shape *other = shapes[j];
+        if (!other->isSheet()) {
+          shape->collide(other);
+        }
+      }
+    }
+  }
+
+  for (int i = 0; i < shapes.size(); ++i) {
+    Shape *shape = shapes[i];
     uint32_t nv, nn, nt;
     glm::vec3 *vertices, *normals;
     glm::ivec3 *triangles;
@@ -65,9 +80,9 @@ void Simulator::render() {
     r.setUniform(program, "objectColor", shape->color);
     r.drawObject(shape->object);
 
-    r.setupWireFrame();
-    r.setUniform(program, "objectColor", vec3(0.0f, 0.0f, 0.0f));
-    r.drawObject(shape->object);
+    // r.setupWireFrame();
+    // r.setUniform(program, "objectColor", vec3(0.0f, 0.0f, 0.0f));
+    // r.drawObject(shape->object);
   }
 
   r.show();
