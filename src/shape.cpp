@@ -286,12 +286,6 @@ void Sheet::collide(Shape *s) {
     glm::vec3 dp;
     glm::vec3 dv;
     if (s->checkCollision(p, v, mass, &dp, &dv)) {
-      std::cout << "Collision detected" << std::endl;
-      std::cout << "p: " << p.x << " " << p.y << " " << p.z << std::endl;
-      std::cout << "v: " << v.x << " " << v.y << " " << v.z << std::endl;
-      std::cout << "dp: " << dp.x << " " << dp.y << " " << dp.z << std::endl;
-      std::cout << "dv: " << dv.x << " " << dv.y << " " << dv.z << std::endl;
-
       vertices[i] += glm::vec3(shape_to_sheet_t * glm::vec4(dp, 0.0f));
       velocities[i] += glm::vec3(shape_to_sheet_t * glm::vec4(dv, 0.0f));
     }
@@ -417,7 +411,7 @@ bool Cylinder::checkCollision(const glm::vec3 p, const glm::vec3 v, float m,
     *dp = poc - p;
   } else if (distAlongAxis > height - COLLISION_ERR) {
     glm::vec3 poc =
-        p - normal * distAlongAxis + bottom - top + COLLISION_ERR * normal;
+        p - normal * distAlongAxis + top - bottom + COLLISION_ERR * normal;
     getDV(v, poc, normal, m, dv);
     *dp = poc - p;
   } else {
