@@ -68,7 +68,6 @@ void Simulator::render() {
   r.enableDepthTest();
   r.useShaderProgram(program);
 
-  r.setUniform(program, "model", glm::mat4(1.0));
   r.setUniform(program, "view", camera.getViewMatrix());
   r.setUniform(program, "projection", camera.getProjectionMatrix());
   r.setUniform(program, "lightPos", camera.position);
@@ -77,6 +76,7 @@ void Simulator::render() {
 
   for (auto shape : shapes) {
     r.setupFilledFaces();
+    r.setUniform(program, "model", shape->getTransform());
     r.setUniform(program, "objectColor", shape->color);
     r.drawObject(shape->object);
 

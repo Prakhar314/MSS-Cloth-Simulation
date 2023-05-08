@@ -17,7 +17,7 @@ int main() {
   sheet->init();
   sheet->fixParticle(0, 10);
   sheet->fixParticle(10, 10);
-  sheet->initTransform(m);
+  sheet->setTransform(m);
   s.addShape(sheet);
 
   m = glm::translate(m, glm::vec3(0.0f, -1.0f, -0.0f));
@@ -25,7 +25,7 @@ int main() {
   Sphere *sphere = new Sphere();
   sphere->setDimensions(0.2f, 20, 20);
   sphere->init();
-  sphere->initTransform(m);
+  sphere->setTransform(m);
   sphere->setMaterial(0.5f, 0.5f);
   sphere->color = glm::vec3(1.0f, 0.0f, 0.0f);
   s.addShape(sphere);

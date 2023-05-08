@@ -22,15 +22,7 @@ void Shape::initBuffers() {
   }
 }
 
-void Shape::initTransform(const glm::mat4 &M) {
-  for (size_t i = 0; i < nv; i++) {
-    vertices[i] = glm::vec3(M * glm::vec4(vertices[i], 1.0));
-    normals[i] = glm::vec3(M * glm::vec4(normals[i], 0.0));
-    if (isSheet()) {
-      velocities[i] = glm::vec3(M * glm::vec4(velocities[i], 0.0));
-    }
-  }
-}
+void Shape::setTransform(const glm::mat4 &M) { transform = M; }
 
 void Shape::update(float t) {
   if (!isSheet()) {
@@ -282,9 +274,15 @@ bool Sphere::checkCollision(const glm::vec3 p, const glm::vec3 v, float m,
 }
 
 void Sheet::collide(Shape *s) {
+  glm::mat4 sheet_t = getTransform();
+  glm::mat4 sheet_inv_t = glm::inverse(sheet_t);
+  glm::mat4 shape_t = s->getTransform();
+  glm::mat4 shape_inv_t = glm::inverse(shape_t);
+  glm::mat4 sheet_to_shape_t = shape_inv_t * sheet_t;
+  glm::mat4 shape_to_sheet_t = sheet_inv_t * shape_t;
   for (size_t i = 0; i < nv; i++) {
-    glm::vec3 p = vertices[i];
-    glm::vec3 v = velocities[i];
+    glm::vec3 p = sheet_to_shape_t * glm::vec4(vertices[i], 1.0f);
+    glm::vec3 v = sheet_to_shape_t * glm::vec4(velocities[i], 0.0f);
     glm::vec3 dp;
     glm::vec3 dv;
     if (s->checkCollision(p, v, mass, &dp, &dv)) {
@@ -294,8 +292,8 @@ void Sheet::collide(Shape *s) {
       std::cout << "dp: " << dp.x << " " << dp.y << " " << dp.z << std::endl;
       std::cout << "dv: " << dv.x << " " << dv.y << " " << dv.z << std::endl;
 
-      vertices[i] += dp;
-      velocities[i] += dv;
+      vertices[i] += glm::vec3(shape_to_sheet_t * glm::vec4(dp, 0.0f));
+      velocities[i] += glm::vec3(shape_to_sheet_t * glm::vec4(dv, 0.0f));
     }
   }
 }

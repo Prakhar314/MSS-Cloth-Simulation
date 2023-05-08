@@ -24,6 +24,8 @@ protected:
   glm::vec3 constantVelocity = glm::vec3(0.0f);
   glm::vec3 constantOmega = glm::vec3(0.0f);
 
+  glm::mat4 transform = glm::mat4(1.0f);
+
   float e = 0.5f, mu = 0.5f;
 
   void initBuffers();
@@ -38,12 +40,14 @@ public:
   virtual void update(float t);
 
   void setConstantVelocity(const glm::vec3 &v);
-  void initTransform(const glm::mat4 &M);
+  void setTransform(const glm::mat4 &M);
 
   void setMaterial(float e, float mu) {
     this->e = e;
     this->mu = mu;
   }
+
+  glm::mat4 getTransform() { return transform; }
 
   virtual bool isSheet() { return false; }
 

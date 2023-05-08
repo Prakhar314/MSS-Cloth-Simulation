@@ -15,7 +15,7 @@ int main() {
   sheet->init();
   sheet->fixParticle(0, 10);
   sheet->fixParticle(10, 10);
-  sheet->initTransform(m);
+  sheet->setTransform(m);
   s.addShape(sheet);
 
   float t = SDL_GetTicks64() / 1e3;

@@ -16,14 +16,14 @@ int main() {
   sheet->init();
   sheet->fixParticle(0, 10);
   sheet->fixParticle(10, 10);
-  sheet->initTransform(m);
+  sheet->setTransform(m);
   s.addShape(sheet);
 
   m = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -0.9f, 0.0f));
   Plane *p = new Plane();
   p->setDimensions(glm::vec3(0, 1, 0));
   p->init();
-  p->initTransform(m);
+  p->setTransform(m);
   p->color = glm::vec3(0.5f, 0.5f, 0.5f);
   s.addShape(p);
 
@@ -31,7 +31,7 @@ int main() {
   Cylinder *c = new Cylinder();
   c->setDimensions(0.1f, 2.0f, 20, 10);
   c->init();
-  c->initTransform(m);
+  c->setTransform(m);
   c->setConstantVelocity(glm::vec3(0.0f, 0.2f, 0.0f));
   c->color = glm::vec3(0.0f, 0.0f, 0.5f);
   s.addShape(c);
@@ -41,7 +41,7 @@ int main() {
   sphere->setDimensions(0.2f, 20, 20);
   sphere->color = glm::vec3(1.0f, 0.0f, 0.0f);
   sphere->init();
-  sphere->initTransform(m);
+  sphere->setTransform(m);
   s.addShape(sphere);
 
   float t = SDL_GetTicks64() / 1e3;
