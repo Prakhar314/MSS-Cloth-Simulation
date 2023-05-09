@@ -10,7 +10,7 @@
 namespace GL = COL781::OpenGL;
 
 #define PI 3.14159265358979323846f
-#define COLLISION_ERR 0.017f
+#define COLLISION_ERR 0.02f
 
 class Shape {
 protected:
@@ -40,6 +40,7 @@ public:
   virtual void update(float t);
 
   void setConstantVelocity(const glm::vec3 &v);
+  void setConstantOmega(const glm::vec3 &omega);
   void setTransform(const glm::mat4 &M);
 
   void setMaterial(float e, float mu) {
@@ -71,7 +72,7 @@ public:
     triangles = this->triangles;
   }
 
-  ~Shape() {
+  virtual ~Shape() {
     if (vertices == nullptr)
       return;
     delete[] vertices;
@@ -127,8 +128,13 @@ public:
   void fixParticle(uint32_t i, uint32_t j);
   void init();
   ~Sheet() {
-    if (springs == nullptr)
+    if (vertices == nullptr)
       return;
+    delete[] vertices;
+    delete[] normals;
+    delete[] triangles;
+    delete[] velocities;
+    delete[] acc;
     delete[] springs;
   }
 

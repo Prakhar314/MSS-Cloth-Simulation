@@ -35,6 +35,7 @@ void Shape::update(float t) {
 }
 
 void Shape::setConstantVelocity(const glm::vec3 &v) { constantVelocity = v; }
+void Shape::setConstantOmega(const glm::vec3 &omega) { constantOmega = omega; }
 
 void Shape::recomputeNormals() {
   for (size_t i = 0; i < nv; i++) {
