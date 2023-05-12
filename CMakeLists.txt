@@ -10,7 +10,7 @@ find_package(glm REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(SDL2 REQUIRED)
 
-add_library(col781 src/hw.cpp src/camera.cpp src/simulator.cpp src/shape.cpp src/container.cpp)
+add_library(col781 src/hw.cpp src/camera.cpp src/simulator.cpp src/shape.cpp src/container.cpp src/sheet.cpp)
 target_link_libraries(col781 GLEW::GLEW glm::glm OpenGL::GL SDL2::SDL2)
 
 file(GLOB APP_SOURCES examples/*.cpp)

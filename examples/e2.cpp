@@ -1,5 +1,4 @@
-
-#include "../src/shape.hpp"
+#include "../src/sheet.hpp"
 #include "../src/simulator.hpp"
 #include <glm/gtx/transform.hpp>
 #include <iostream>
