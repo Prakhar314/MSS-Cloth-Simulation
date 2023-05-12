@@ -34,19 +34,7 @@ void Simulator::addShape(Shape *shape) {
 
 void Simulator::update(float t) {
   for (int i = 0; i < shapes.size(); ++i) {
-    shapes[i]->update(t);
-  }
-
-  for (int i = 0; i < shapes.size(); ++i) {
-    Shape *shape = shapes[i];
-    if (shape->isSheet()) {
-      for (int j = i + 1; j < shapes.size(); ++j) {
-        Shape *other = shapes[j];
-        if (!other->isSheet()) {
-          shape->collide(other);
-        }
-      }
-    }
+    shapes[i]->update(t, shapes);
   }
 
   for (int i = 0; i < shapes.size(); ++i) {

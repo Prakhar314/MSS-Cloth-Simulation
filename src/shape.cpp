@@ -24,7 +24,7 @@ void Shape::initBuffers() {
 
 void Shape::setTransform(const glm::mat4 &M) { transform = M; }
 
-void Shape::update(float t) {
+void Shape::update(float t, const vector<Shape *> &shapes) {
   if (!isSheet()) {
     glm::vec3 c = getCenter();
     for (int i = 0; i < nv; ++i) {
@@ -104,6 +104,9 @@ void Sheet::init() {
   nt = 2 * m * n;
 
   initBuffers();
+  if (selfCollisions) {
+    bins = new vector<uint16_t>[m * n * max(m, n)];
+  }
 
   // Create the vertices, normals and velocities
   for (size_t i = 0; i < m + 1; i++) {
@@ -173,12 +176,116 @@ void Sheet::init() {
   assert(springIndex == nSprings);
 }
 
-void Sheet::update(float t) {
+void Sheet::selfCollide() {
+
+  glm::vec3 max_p = vertices[0];
+  glm::vec3 min_p = vertices[0];
+
+  // find number of bins
+  for (int i = 0; i < nv; i++) {
+    max_p = glm::max(max_p, vertices[i]);
+    min_p = glm::min(min_p, vertices[i]);
+  }
+
+  int bin_x = ceil((max_p.x - min_p.x) / spacing);
+  int bin_y = ceil((max_p.y - min_p.y) / spacing);
+  int bin_z = ceil((max_p.z - min_p.z) / spacing);
+
+  // clear bins
+  for (int i = 0; i < bin_x * bin_y * bin_z; i++) {
+    bins[i].clear();
+  }
+
+  // fill bins
+  for (uint16_t i = 0; i < nv; i++) {
+    uint16_t x = floor((vertices[i].x - min_p.x) / spacing);
+    uint16_t y = floor((vertices[i].y - min_p.y) / spacing);
+    uint16_t z = floor((vertices[i].z - min_p.z) / spacing);
+    bins[x * bin_y * bin_z + y * bin_z + z].push_back(i);
+  }
+
+  for (int i = 0; i < nv; ++i) {
+    // get bin
+    int x = floor((vertices[i].x - min_p.x) / spacing);
+    int y = floor((vertices[i].y - min_p.y) / spacing);
+    int z = floor((vertices[i].z - min_p.z) / spacing);
+
+    // check all 3x3x3 bins
+    for (int x_d = x - 1; x_d < x + 2; x_d++) {
+      for (int y_d = y - 1; y_d < y + 2; y_d++) {
+        for (int z_d = z - 1; z_d < z + 2; z_d++) {
+          if (x_d < 0 || x_d >= bin_x || y_d < 0 || y_d >= bin_y || z_d < 0 ||
+              z_d >= bin_z) {
+            continue;
+          }
+          int bin_idx = x_d * bin_y * bin_z + y_d * bin_z + z_d;
+          for (int j : bins[bin_idx]) {
+            if (i == j) {
+              continue;
+            }
+            float l = glm::length(vertices[i] - vertices[j]);
+            if (l < spacing) {
+              bool i_fixed = false;
+              bool j_fixed = false;
+
+              for (auto &k : fixedParticles) {
+                if (i == k) {
+                  i_fixed = true;
+                }
+                if (j == k) {
+                  j_fixed = true;
+                }
+              }
+
+              glm::vec3 x_hat = (vertices[i] - vertices[j]) / l;
+              glm::vec3 dp = (spacing - l) * x_hat;
+
+              if (i_fixed) {
+                vertices[j] -= dp;
+              } else if (j_fixed) {
+                vertices[i] += dp;
+              } else {
+                vertices[i] += dp / 2.0f;
+                vertices[j] -= dp / 2.0f;
+              }
+              glm::vec3 rv = velocities[i] - velocities[j];
+              glm::vec3 v_n = glm::dot(rv, x_hat) * x_hat;
+              glm::vec3 v_t = rv - v_n;
+              glm::vec3 j_n = -(1 + e) * mass * v_n;
+              float v_t_mag = glm::length(v_t);
+              float j_t_mag = min(mu * glm::length(j_n), mass * v_t_mag);
+              glm::vec3 j_t = -j_t_mag * v_t;
+              // v_t may be 0
+              if (v_t_mag < 0.001f) {
+                j_t = glm::vec3(0, 0, 0);
+              } else {
+                j_t /= v_t_mag;
+              }
+
+              if (i_fixed) {
+                velocities[j] -= (j_n + j_t) / mass;
+              } else if (j_fixed) {
+                velocities[i] += (j_n + j_t) / mass;
+              } else {
+                velocities[i] += (j_n + j_t) / mass / 2.0f;
+                velocities[j] -= (j_n + j_t) / mass / 2.0f;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+void Sheet::update(float t, const vector<Shape *> &shapes) {
   // Compute the forces
   glm::vec3 gravity = glm::vec3(0, g, 0);
-  fill_n(acc, nv, gravity);
+  fill_n(acc, nv, glm::inverse(this->transform) * glm::vec4(gravity, 0));
   for (size_t i = 0; i < nSprings; i++) {
     Spring s = springs[i];
+    if (s.ks < 0)
+      continue; // skip PBD constraints
     uint32_t i1 = s.i;
     uint32_t i2 = s.j;
     glm::vec3 p1 = vertices[i1];
@@ -193,16 +300,25 @@ void Sheet::update(float t) {
     acc[i1] -= f / mass;
     acc[i2] += f / mass;
   }
-  // keep the top left and right corners fixed
+  // fixed particles have zero acceleration
   for (auto &i : fixedParticles) {
     acc[i] = glm::vec3(0, 0, 0);
   }
-  // acc[height] = glm::vec3(0, 0, 0);
-  // acc[width * height + width + height] = glm::vec3(0, 0, 0);
   for (size_t i = 0; i < nv; i++) {
     velocities[i] += acc[i] * t;
     vertices[i] += velocities[i] * t;
     assert(glm::length(velocities[i]) < 1000);
+  }
+
+  // constraint resolution
+  if (selfCollisions) {
+    selfCollide();
+  }
+  for (int j = 0; j < shapes.size(); ++j) {
+    Shape *other = shapes[j];
+    if (!other->isSheet()) {
+      collide(other);
+    }
   }
   recomputeNormals();
 }
@@ -258,7 +374,6 @@ glm::vec3 Sphere::getCenter() {
 
 bool Sphere::checkCollision(const glm::vec3 p, const glm::vec3 v, float m,
                             glm::vec3 *dp, glm::vec3 *dv) {
-
   glm::vec3 origin = getCenter();
   float dist = glm::length(p - origin);
   float c_radius = radius + COLLISION_ERR;
@@ -274,7 +389,7 @@ bool Sphere::checkCollision(const glm::vec3 p, const glm::vec3 v, float m,
   return true;
 }
 
-void Sheet::collide(Shape *s) {
+void Sheet::collide(Shape *s, bool updatePos, bool updateVel) {
   glm::mat4 sheet_t = getTransform();
   glm::mat4 sheet_inv_t = glm::inverse(sheet_t);
   glm::mat4 shape_t = s->getTransform();
@@ -287,14 +402,15 @@ void Sheet::collide(Shape *s) {
     glm::vec3 dp;
     glm::vec3 dv;
     if (s->checkCollision(p, v, mass, &dp, &dv)) {
-      vertices[i] += glm::vec3(shape_to_sheet_t * glm::vec4(dp, 0.0f));
-      velocities[i] += glm::vec3(shape_to_sheet_t * glm::vec4(dv, 0.0f));
+      if (updatePos)
+        vertices[i] += glm::vec3(shape_to_sheet_t * glm::vec4(dp, 0.0f));
+      if (updateVel)
+        velocities[i] += glm::vec3(shape_to_sheet_t * glm::vec4(dv, 0.0f));
     }
   }
 }
 
 void Plane::init() {
-
   assert(glm::length(normal) == 1);
   nv = 4;
   nn = 4;
@@ -310,7 +426,6 @@ void Plane::init() {
 
   glm::mat4 rot = glm::mat4(1.0f);
   if (abs(angle) > 0.01f) {
-
     glm::vec3 perp = glm::normalize(glm::cross(init_normal, normal));
     glm::mat4 rot = glm::rotate(glm::mat4(1.0f), angle, perp);
   }

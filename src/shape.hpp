@@ -37,7 +37,7 @@ public:
   GL::AttribBuf vertexBuf, normalBuf;
   glm::vec3 color = glm::vec3(1.0, 0.5, 0.0);
 
-  virtual void update(float t);
+  virtual void update(float t, const std::vector<Shape *> &shapes);
 
   void setConstantVelocity(const glm::vec3 &v);
   void setConstantOmega(const glm::vec3 &omega);
@@ -51,8 +51,6 @@ public:
   glm::mat4 getTransform() { return transform; }
 
   virtual bool isSheet() { return false; }
-
-  virtual void collide(Shape *s) {}
 
   virtual bool checkCollision(const glm::vec3 p, const glm::vec3 v, float m,
                               glm::vec3 *dp, glm::vec3 *dv) {
@@ -106,12 +104,19 @@ class Sheet : public Shape {
   float ksShear = 0.06f, kdShear = 0.0006f;
   float g = -0.98f;
 
+  // PBD
+  bool selfCollisions = false;
+  std::vector<uint16_t> *bins = nullptr;
+
 public:
-  Sheet() {}
+  explicit Sheet(bool selfCollisions = false) {
+    this->selfCollisions = selfCollisions;
+  }
 
   bool isSheet() override { return true; }
 
-  void collide(Shape *s) override;
+  void selfCollide();
+  void collide(Shape *s, bool updatePos = true, bool updateVel = true);
 
   void setDimensions(uint32_t width, uint32_t height, float spacing);
   void setGravity(float g) { this->g = g; }
@@ -136,11 +141,14 @@ public:
     delete[] velocities;
     delete[] acc;
     delete[] springs;
+    if (bins != nullptr) {
+      delete[] bins;
+    }
   }
 
   glm::vec3 getCenter() override;
 
-  void update(float t) override;
+  void update(float t, const std::vector<Shape *> &shapes) override;
 };
 
 class Sphere : public Shape {
