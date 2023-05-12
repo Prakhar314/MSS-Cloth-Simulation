@@ -3,6 +3,8 @@
 #include <glm/gtx/transform.hpp>
 #include <iostream>
 
+// collision with sphere, plane and cylinder
+
 int main() {
   int width = 640, height = 480;
 
@@ -41,6 +43,7 @@ int main() {
   sphere->setDimensions(0.2f, 20, 20);
   sphere->color = glm::vec3(1.0f, 0.0f, 0.0f);
   sphere->init();
+  sphere->setMaterial(0.5f, 0.5f);
   sphere->setTransform(m);
   s.addShape(sphere);
 

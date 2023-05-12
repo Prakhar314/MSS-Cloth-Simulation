@@ -23,6 +23,6 @@ public:
   void addShape(Shape* shape);
   void update(float t);
   void render();
-
+  void setCameraZ(float z);
   bool shouldQuit() { return r.shouldQuit(); }
 };

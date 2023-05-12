@@ -3,7 +3,9 @@
 #include <glm/gtx/transform.hpp>
 #include <iostream>
 
-int main() {
+// hung cloth, with or without pbd
+
+int main(int argc, char **argv) {
   int width = 640, height = 480;
 
   glm::mat4 m = glm::translate(glm::mat4(1.0f), glm::vec3(0.5f, 0.0f, 0.0f));
@@ -11,6 +13,7 @@ int main() {
   Simulator s;
   s.init("Animation", width, height);
   Sheet *sheet = new Sheet();
+  sheet->setUsePBD(argc > 1);
   sheet->setDimensions(10, 10, 0.1f);
   sheet->init();
   sheet->fixParticle(0, 10);

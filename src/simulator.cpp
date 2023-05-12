@@ -17,6 +17,11 @@ void Simulator::init(const std::string &filename, const int width,
   program = r.createShaderProgram(r.vsPhongShading(), r.fsPhongShading());
 }
 
+void Simulator::setCameraZ(float z) {
+  camCtl.camera.setCameraView(vec3(0.0, 0.0, z), glm::vec3(0.0),
+                              glm::vec3(0.0, 1.0, 0.0));
+}
+
 void Simulator::addShape(Shape *shape) {
   shape->object = r.createObject();
 

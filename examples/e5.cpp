@@ -3,6 +3,8 @@
 #include <glm/gtx/transform.hpp>
 #include <iostream>
 
+// hung cloth, with or without self collision
+
 int main(int argc, char *argv[]) {
   int width = 640, height = 480;
 

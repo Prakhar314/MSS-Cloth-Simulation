@@ -4,6 +4,8 @@
 #include <glm/gtx/transform.hpp>
 #include <iostream>
 
+// collision with sphere
+
 int main() {
   int width = 640, height = 480;
 
@@ -20,7 +22,7 @@ int main() {
   sheet->setTransform(m);
   s.addShape(sheet);
 
-  m = glm::translate(m, glm::vec3(0.0f, -1.0f, -0.0f));
+  m = glm::translate(m, glm::vec3(0.0f, -0.9f, -0.1f));
 
   Sphere *sphere = new Sphere();
   sphere->setDimensions(0.2f, 20, 20);

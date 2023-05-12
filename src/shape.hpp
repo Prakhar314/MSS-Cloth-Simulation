@@ -104,8 +104,9 @@ class Sheet : public Shape {
   float ksShear = 0.06f, kdShear = 0.0006f;
   float g = -0.98f;
 
-  // PBD
-  bool selfCollisions = false;
+  bool usePBD = true;
+  bool selfCollisions = true;
+  glm::vec3 *oldPositions = nullptr;
   std::vector<uint16_t> *bins = nullptr;
 
 public:
@@ -113,10 +114,11 @@ public:
 
   bool isSheet() override { return true; }
 
-  void selfCollide();
-  void collide(Shape *s, bool updatePos = true, bool updateVel = true);
+  void selfCollide(bool updateVel = true);
+  void collide(Shape *s, bool updateVel = true);
 
   void setSelfCollisions(bool selfCollisions);
+  void setUsePBD(bool usePBD);
   void setDimensions(uint32_t width, uint32_t height, float spacing);
   void setGravity(float g) { this->g = g; }
   void setMass(float mass) { this->mass = mass; }
@@ -142,6 +144,9 @@ public:
     delete[] springs;
     if (bins != nullptr) {
       delete[] bins;
+    }
+    if (oldPositions != nullptr) {
+      delete[] oldPositions;
     }
   }
 
