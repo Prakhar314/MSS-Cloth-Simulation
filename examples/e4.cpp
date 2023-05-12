@@ -101,11 +101,8 @@ int main(int argc, char **argv) {
   larm_r_c->setPosition(glm::vec3(-0.57f, 0.0f, 0.0f));
   larm_r_c->setRecenter(glm::vec3(-0.6f, 0.0f, 0.0f));
   larm_r_c->setRotation(glm::vec3(0.0f, 0.0f, -1.0f));
-  larm_r_c->setTimeSteps({{5.0f, 0.0f},
-                          {6.0, 90.0f},
-                          {7.0, 70.0f},
-                          {8.0, 90.0f},
-                          {9.0, 0.0f}});
+  larm_r_c->setTimeSteps(
+      {{5.0f, 0.0f}, {6.0, 90.0f}, {7.0, 70.0f}, {8.0, 90.0f}, {9.0, 0.0f}});
   Cylinder *larm_r = new Cylinder();
   larm_r->setDimensions(0.2f, 1.2f, 20, 10);
   larm_r->init();

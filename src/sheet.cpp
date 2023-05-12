@@ -245,7 +245,7 @@ void Sheet::update(float t, const vector<Shape *> &shapes) {
 
   // constraint resolution
   if (usePBD) {
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 20; i++) {
       // structural constraints
       for (int j = 0; j < nSprings; j++) {
         if (springs[j].ks > 0) {
