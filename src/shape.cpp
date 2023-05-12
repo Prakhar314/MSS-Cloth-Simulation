@@ -83,6 +83,9 @@ void Shape::getDV(const glm::vec3 &v, const glm::vec3 &poc,
   assert(glm::length(*dv) < 1000.0f);
 }
 
+void Sheet::setSelfCollisions(bool selfCollisions) {
+  this->selfCollisions = selfCollisions;
+}
 void Sheet::setDimensions(uint32_t width, uint32_t height, float spacing) {
   this->width = width;
   this->height = height;

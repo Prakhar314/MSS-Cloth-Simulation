@@ -109,15 +109,14 @@ class Sheet : public Shape {
   std::vector<uint16_t> *bins = nullptr;
 
 public:
-  explicit Sheet(bool selfCollisions = false) {
-    this->selfCollisions = selfCollisions;
-  }
+  Sheet() {}
 
   bool isSheet() override { return true; }
 
   void selfCollide();
   void collide(Shape *s, bool updatePos = true, bool updateVel = true);
 
+  void setSelfCollisions(bool selfCollisions);
   void setDimensions(uint32_t width, uint32_t height, float spacing);
   void setGravity(float g) { this->g = g; }
   void setMass(float mass) { this->mass = mass; }

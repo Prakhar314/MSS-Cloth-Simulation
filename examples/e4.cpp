@@ -10,7 +10,8 @@ int main(int argc, char **argv) {
 
   glm::mat4 m = glm::translate(glm::mat4(1.0f), glm::vec3(0.5f, 0.3f, 0.0f));
   if (argc > 1) {
-    Sheet *sheet = new Sheet(true);
+    Sheet *sheet = new Sheet();
+    sheet->setSelfCollisions(true);
     float mass = 0.001f;
     float ksStr = 0.12f, kdStr = 0.0012f;
     float ksBend = 0.01f, kdBend = 0.0001f;

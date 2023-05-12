@@ -12,12 +12,13 @@ int main(int argc, char *argv[]) {
   Simulator s;
   s.init("Animation", width, height);
 
-  Sheet *sheet = new Sheet(argc > 1);
+  Sheet *sheet = new Sheet();
   float mass = 0.001f;
   float ksStr = 0.12f, kdStr = 0.0012f;
   float ksBend = 0.01f, kdBend = 0.0001f;
   float ksShear = 0.06f, kdShear = 0.0006f;
   float g = -0.98f;
+  sheet->setSelfCollisions(argc > 1);
   sheet->setDimensions(20, 20, 0.05f);
   sheet->setMass(mass / 4);
   sheet->setGravity(g / 4);
