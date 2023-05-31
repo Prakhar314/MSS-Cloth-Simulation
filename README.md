@@ -1,15 +1,51 @@
-# COL781 Assignment 4: Simulation and Keyframing
+# Cloth Simulation Using Mass Spring Systems
+Physics-based simulation of cloth using mass-spring systems.
 
-<https://www.cse.iitd.ac.in/~narain/courses/col781/a4.html>
+## Features
+- Cloth simulation with configurable parameters: 
+    - Dimensions of the sheet
+    - Mass of each particles
+    - Spring constants 
+    - Damping constants 
+    - Fixed particles 
+- Position based dynamics for structural constraints (instead of structural springs)
+- Collisions with objects
+    - Supported shapes: Sphere, cyclinder and rectangles
+    - Inter particle collisions 
+- Animation using keyframing
+    - Creating shape heirarchies
+    - Interpolation between keyframes using Catmull-Rom splines
 
-Make sure that [GLEW](https://glew.sourceforge.net/), [glm](https://github.com/g-truc/glm), and [SDL2](https://www.libsdl.org/) are installed. Ideally, these should be installed by your package manager rather than manually (at least, if you are on Linux or Mac).
+## Demo 
+<p align="center">
+  <img src="demo/s1.gif" />
+</p>
+<p align="center">
+  <img src="demo/s2.gif" />
+</p>
+<p align="center">
+  <img src="demo/s3.gif" />
+</p>
+<p align="center">
+  <img src="demo/s4.gif" />
+</p>
 
-Then compile the code using the standard CMake procedure:
-
+## Installation
+1. Install required packages: `SDL2`, `SDL2 Image`, `OpenGL`, `GLEW`, `CMake`.
+```
+# Ubuntu
+sudo apt-get install -y libsdl2-image-dev libglm-dev libglew-dev libopengl-dev cmake
+```
+2. Create `build` directory in the project root.
 ```
 mkdir build
+```
+3. Build the project
+```
 cd build
 cmake ..
 make
 ```
+4. Run any of the examples: `e1`, `e2`, `e3`, ...
+
 
